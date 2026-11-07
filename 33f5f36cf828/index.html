@@ -24,7 +24,7 @@ textarea,input{width:100%;border:1px solid var(--line);border-radius:10px;paddin
 <b>Как играть</b><br>
 1. Каждый заполняет на <b>своём</b> телефоне, не подглядывая.<br>
 2. ✅ — хочу, 🤔 — может быть, обсудим, ❌ — нет. Пропуск = нет.<br>
-3. Внизу нажми «Мой код» и отправь его партнёру. Вставь код партнёра — увидишь совпадения, а если партнёр разрешил, то и все его ответы.<br>
+3. Внизу нажми «Мой код» и отправь его партнёру. Вставь код партнёра — увидишь полное сравнение: где совпали, а где нет.<br>
 4. Любой ответ можно поменять. Чужие ❌ не обсуждаются и не уговариваются.
 <div style="margin-top:10px"><input id="nm" placeholder="Твоё имя (необязательно)"></div>
 </div>
@@ -36,7 +36,6 @@ textarea,input{width:100%;border:1px solid var(--line);border-radius:10px;paddin
 <button class="btn" id="cp">Мой код → скопировать</button>
 <div class="mut" id="cpm"></div>
 <div style="margin-top:10px"><textarea id="pc" rows="2" placeholder="Вставь сюда код партнёра"></textarea></div>
-<div style="margin:8px 0" class="mut"><label><input type="radio" name="mode" value="a" checked> Партнёр видит все мои ответы</label><br><label><input type="radio" name="mode" value="m"> Партнёр видит только совпадения</label><br>Выбери до того, как копировать код.</div>
 <button class="btn" id="cmp">Сравнить</button>
 <button class="btn g" id="rst">Очистить мои ответы</button>
 <div id="res" class="res"></div>
@@ -61,18 +60,17 @@ document.querySelectorAll('.b input').forEach(x=>{const i=x.name.slice(1);if(A['
 const paint=()=>document.querySelectorAll('.b input').forEach(x=>{x.checked=A[x.name]===x.value});
 const nm=document.getElementById('nm'),own=document.getElementById('own');nm.value=A.nm||'';own.value=A.own||'';
 nm.oninput=()=>{A.nm=nm.value;save()};own.oninput=()=>{A.own=own.value;save()};
-const code=()=>'DNM2'+myMode()+'-'+items.map((_,i)=>A['i'+i]||'0').join('');
+const code=()=>'DNM2-'+items.map((_,i)=>A['i'+i]||'0').join('');
 document.getElementById('cp').onclick=async()=>{const c=code();const m=document.getElementById('cpm');
 try{await navigator.clipboard.writeText(c);m.textContent='Скопировано! Отправь партнёру.'}catch(e){m.innerHTML='Скопируй вручную:<br><code style="word-break:break-all">'+c+'</code>'}};
 const myMode=()=>(document.querySelector('input[name=mode]:checked')||{}).value||'m';
-document.getElementById('cmp').onclick=()=>{const r=document.getElementById('res');const mm=document.getElementById('pc').value.trim().match(/DNM2([ma])-([012]+)/);const p=mm&&mm[2];
+document.getElementById('cmp').onclick=()=>{const r=document.getElementById('res');const mm=document.getElementById('pc').value.trim().match(/DNM2[ma]?-([012]+)/);const p=mm&&mm[1];
 if(!p||p.length!==items.length){r.innerHTML='<p>Код не подходит. Проверь, что скопирован целиком.</p>';return}
-const both=[],maybe=[];items.forEach((t,i)=>{const a=+(A['i'+i]||0),b=+p[i];if(a===2&&b===2)both.push(t);else if(a>0&&b>0)maybe.push(t)});
-let out='<h3>✅ Оба хотят ('+both.length+')</h3><ul>'+both.map(t=>'<li>'+t+'</li>').join('')+'</ul><h3>🤔 Можно обсудить ('+maybe.length+')</h3><ul>'+maybe.map(t=>'<li>'+t+'</li>').join('')+'</ul>'+(both.length+maybe.length?'':'<p>Совпадений пока нет. Это тоже нормально.</p>');
-const E=['❌','🤔','✅'];
-if(mm[1]==='a'){out+='<h3>Все ответы партнёра</h3><div class="mut">я · партнёр</div><ul>'+items.map((t,i)=>'<li>'+E[+(A['i'+i]||0)]+' '+E[+p[i]]+' — '+t+'</li>').join('')+'</ul>'}
-else{out+='<p class="mut">Партнёр решил показывать только совпадения.</p>'}
-r.innerHTML=out};
+const E=['❌','🤔','✅'];const G={yy:[],ym:[],diff:[],nn:[]};
+items.forEach((t,i)=>{const a=+(A['i'+i]||0),b=+p[i];const row=E[a]+' '+E[b]+' — '+t;
+if(a===2&&b===2)G.yy.push(row);else if(a>0&&b>0)G.ym.push(row);else if(a>0||b>0)G.diff.push(row);else G.nn.push(row)});
+const sec=(h,l,c)=>'<h3>'+h+' ('+l.length+')</h3>'+(c?'<details><summary>показать</summary>':'')+'<ul>'+l.map(x=>'<li>'+x+'</li>').join('')+'</ul>'+(c?'</details>':'');
+r.innerHTML='<div class="mut">Слева мой ответ, справа партнёра</div>'+sec('✅ Совпали: оба хотят',G.yy)+sec('🤔 Почти: хотят или «может быть»',G.ym)+sec('↔️ Не совпали: один хочет, другой нет',G.diff)+sec('❌ Оба нет',G.nn,true)};
 document.getElementById('rst').onclick=()=>{if(confirm('Очистить все твои ответы?')){A={};save();nm.value='';own.value='';paint()}};
 paint();
 </script></body></html>
