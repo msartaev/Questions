@@ -66,12 +66,12 @@ document.getElementById('cp').onclick=async()=>{const c=code();const m=document.
 try{await navigator.clipboard.writeText(c);m.textContent='Скопировано! Отправь партнёру.'}catch(e){m.innerHTML='Скопируй вручную:<br><code style="word-break:break-all">'+c+'</code>'}};
 document.getElementById('cmp').onclick=()=>{const r=document.getElementById('res');const mm=document.getElementById('pc').value.replace(/\s+/g,'').match(/DNM5-([012]+)-?([A-Za-z0-9_-]*)/);const p=mm&&mm[1];let W={};try{W=mm&&mm[2]?JSON.parse(b64d(mm[2])):{}}catch(e){}
 if(!p||p.length!==SL.length){r.innerHTML='<p>Код не подходит. Проверь, что он скопирован целиком и что у вас обоих открыта одна и та же версия страницы.</p>';return}
-const E=['❌','🤔','✅'];const G={yy:[],ym:[],diff:[],nn:[]};
+const E=['❌','🤔','✅'];const G={yy:[],ym:[],me:[],pa:[],nn:[]};
 SL.forEach(([t,k,j],i)=>{let lab=t;if(k==='r')lab=t+' — для меня';if(k==='g')lab=t+' — для партнёра';
 const a=v(i),b=+p[j];const row=E[a]+' '+E[b]+' — '+lab;
-if(a===2&&b===2)G.yy.push(row);else if(a>0&&b>0)G.ym.push(row);else if(a>0||b>0)G.diff.push(row);else G.nn.push(row)});
+if(a===2&&b===2)G.yy.push(row);else if(a>0&&b>0)G.ym.push(row);else if(a>0)G.me.push(row);else if(b>0)G.pa.push(row);else G.nn.push(row)});
 const sec=(h,l,c)=>'<h3>'+h+' ('+l.length+')</h3>'+(c?'<details><summary class="mut">показать</summary>':'')+'<ul>'+l.map(x=>'<li>'+x+'</li>').join('')+'</ul>'+(c?'</details>':'');
-r.innerHTML='<div class="mut">Слева мой ответ, справа партнёра. «Для меня» — когда это делают мне.</div>'+sec('✅ Совпали: оба хотят',G.yy)+sec('🤔 Почти: хотят или «может быть»',G.ym)+sec('↔️ Не совпали: один хочет, другой нет',G.diff)+sec('❌ Оба нет',G.nn,true)+((W.w1||W.w2)?'<h3>✍️ Партнёр написал</h3>'+(W.w1?'<p><b>Хочет, чего нет в списке:</b><br>'+esc(W.w1)+'</p>':'')+(W.w2?'<p><b>Точно не хочет:</b><br>'+esc(W.w2)+'</p>':''):'')};
+r.innerHTML='<div class="mut">Слева мой ответ, справа партнёра. «Для меня» — когда это делают мне.</div>'+sec('✅ Совпали: оба хотят',G.yy)+sec('🤔 Почти: хотят или «может быть»',G.ym)+sec('🙋 Я хочу, партнёр нет',G.me)+sec('💭 Партнёр хочет, я нет',G.pa)+sec('❌ Оба нет',G.nn,true)+((W.w1||W.w2)?'<h3>✍️ Партнёр написал</h3>'+(W.w1?'<p><b>Хочет, чего нет в списке:</b><br>'+esc(W.w1)+'</p>':'')+(W.w2?'<p><b>Точно не хочет:</b><br>'+esc(W.w2)+'</p>':''):'')};
 const esc=x=>x.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).replace(/\n/g,'<br>');
 document.getElementById('rst').onclick=()=>{if(confirm('Очистить все твои ответы?')){A={};save();document.querySelectorAll('.b input').forEach(x=>x.checked=false);document.querySelectorAll('textarea[data-k]').forEach(t=>t.value='')}};
 </script></body></html>
